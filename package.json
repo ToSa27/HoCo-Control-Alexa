@@ -1,0 +1,30 @@
+{
+  "name": "hoco-alexa",
+  "version": "1.0.0",
+  "description": "HoCo Control Alexa",
+  "main": "alexa.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ToSa27/HoCo-Control-Alexa.git"
+  },
+  "keywords": [
+    "HoCo"
+  ],
+  "author": "Tobias Hoff",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ToSa27/HoCo-Control-Alexa/issues"
+  },
+  "homepage": "https://github.com/ToSa27/HoCo-Control-Alexa#readme",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "express-session": "^1.14.2",
+    "mqtt": "^2.2.1",
+    "request": "^2.79.0"
+  }
+}

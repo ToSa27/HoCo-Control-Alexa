@@ -1,0 +1,19 @@
+{
+ "mqtt": {
+  "url": "mqtts://home.die-hoffs.net:1883",
+  "username": "hoco",
+  "password": "tosa",
+  "prefix": "hoco"
+ },
+ "web": {
+  "port": 1885,
+  "ssl": {
+   "enabled": true,
+   "keyfile": "/opt/hoco/data/certs/privkey.pem",
+   "certfile": "/opt/hoco/data/certs/fullchain.pem"
+  }
+ },
+ "api": {
+  "amazonEmail": "shopping@die-hoffs.net"
+ }
+}
