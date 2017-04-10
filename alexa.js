@@ -60,14 +60,24 @@ app.get('/hoco/test', function(req, res, next) {
 	res.end('hallo test');
 });
 
-app.get('/hoco/api/devices', checkAmazonOAuth, function(req, res, next) {
-	log.info('send result');
-	res.end(JSON.stringify(devices));
+app.get('/hoco/api', checkAmazonOAuth, function(req, res, next) {
+	log.info('cmd: ' + req.query.cmd);
+	switch (req.query.cmd) {
+		case "DiscoverAppliancesRequest":
+			var resp = { discoveredAppliances: JSON.parse(JSON.stringify(devices)) };
+			for (var i = 0; i < resp.discoveredAppliances.length; i++)
+				resp.discoveredAppliances[i].additionalApplianceDetails = {};
+			res.end(JSON.stringify(resp));
+			break;
+		default:
+			res.writeHead(404);
+			res.end();
+	};
 });
 
 app.get('/hoco/api/:applianceId', checkAmazonOAuth, function(req, res, next) {
         log.info('applianceId: ' + req.params.applianceId);
-        log.info('value: ' + req.query.value);
+        log.info('cmd: ' + req.query.cmd);
 	var device;
 	for (var i = 0; i < devices.length; i++) {
 		if (devices[i].applianceId === req.params.applianceId) {
@@ -75,27 +85,43 @@ app.get('/hoco/api/:applianceId', checkAmazonOAuth, function(req, res, next) {
 			break;
 		}
 	}
-	if (device) {
-		var items = [];
-		if (!Array.isArray(device.additionalApplianceDetails))
-			items.push(device.additionalApplianceDetails);
-		else
-			items = device.additionalApplianceDetails;
-		log.info('affecting ' + items.length + ' items');
-		for (var i = 0; i < items.length; i++) {
-			log.info('item: ' + JSON.stringify(items[i]));
-			var topic = items[i].adapter + "/" + items[i].node + "/" + items[i].parameter + "/$set";
-			var value = "unknown";
-			if (req.query.value == "on")
-				value = items[i].onValue;
-			else if (req.query.value == "off")
-				value = items[i].offValue;
-			if (value != "unknown")
-				bus.send(topic, value, {}, 0, false);
-		}
-	        log.info('send result');
-       		res.end("{}");
+	if (!device) {
+		res.writeHead(404);
+                res.end();
+		return;
 	}
+	var items = [];
+	if (!Array.isArray(device.additionalApplianceDetails))
+		items.push(device.additionalApplianceDetails);
+	else
+		items = device.additionalApplianceDetails;
+        if (items.length == 0) {
+                res.writeHead(404);
+                res.end();
+                return;
+        }
+        log.info('affecting ' + items.length + ' items');
+	var skipres = false;
+	for (var i = 0; i < items.length; i++) {
+		log.info('item: ' + JSON.stringify(items[i]));
+		if (items[i].set) {
+			if (req.query.cmd in items[i].set) {
+				var topic = items[i].adapter + "/" + items[i].node + "/" + items[i].parameter + "/$set";
+				bus.send(topic, items[i].set[req.query.cmd], {}, 0, false);
+				log.info('pub: ' + topic + ' = ' + items[i].set[req.query.cmd]);
+			}
+		}
+		if (items[i].get) {
+                        if (req.query.cmd in items[i].get) {
+				skipres = true;
+                                var topic = items[i].adapter + "/" + items[i].node + "/" + items[i].parameter + "/$get";
+                                bus.send(topic, items[i].get[req.query.cmd], {}, 0, false);
+                                log.info('pub: ' + topic + ' = ' + items[i].get[req.query.cmd]);
+                        }			
+		}
+	}
+	if (!skipres)
+		res.end("{}");
 });
 
 app.get('/hoco/privacypolicy', function (req, res) {

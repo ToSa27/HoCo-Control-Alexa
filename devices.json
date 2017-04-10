@@ -1,8 +1,8 @@
 [
  {
   "applianceId": "HoCo1",
-  "manufacturerName": "eq3",
-  "modelName": "HmIP switch",
+  "manufacturerName": "HoCo",
+  "modelName": "Virtual OnOff",
   "version": "1.0",
   "friendlyName": "kellerlicht",
   "friendlyDescription": "kellerlicht",
@@ -16,20 +16,26 @@
     "adapter": "homematicip_NEQ1332404",
     "node": "000855699C5607:4",
     "parameter": "STATE",
-    "onValue": true,
-    "offValue": false
+    "set": {
+     "TurnOnRequest": true,
+     "TurnOffRequest": false
+    }
    },
    {
     "adapter": "zwave_f299944b",
     "node": "2",
     "parameter": "37_2_0",
-    "offValue": false
+    "set": {
+     "TurnOffRequest": false
+    }
    },
    {
     "adapter": "zwave_f299944b",
     "node": "2",
     "parameter": "37_3_0",
-    "offValue": false
+    "set": {
+     "TurnOffRequest": false
+    }
    }
   ]
  }
